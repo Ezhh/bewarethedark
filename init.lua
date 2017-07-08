@@ -113,13 +113,14 @@ minetest.register_globalstep(function(dtime)
                 local pos_y = pos.y
                 -- the middle of the block with the player's head
                 pos.y = math.floor(pos_y) + 1.5
-                local node = minetest.get_node(pos)
+--                local node = minetest.get_node(pos)
 
-                local light_now   = minetest.get_node_light(pos) or 0
-                if node.name == 'ignore' then
+--                local light_now   = minetest.get_node_light(pos) or 0
+--                if node.name == 'ignore' then
                     -- can happen while world loads, set to something innocent
-                    light_now = 9
-                end
+--                    light_now = 9
+--                end
+                local light_now = minetest.get_node_light(pos) or 9
 
                 local sanity = PPA.get_value(player, "bewarethedark_sanity")
                 local overflow_factor = 1.0
