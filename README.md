@@ -1,18 +1,17 @@
-Beware the dark [bewarethedark]
+Beware the Dark 
 =================
 
 A Minetest mod where darkness simply kills you directly.
 
-IMPORTANT NOTE: This version is specifically for use on the 
-Dark Lands Survival server. Please do not assume future compatibility
-with any other server or mod set. (This note will be removed if it's
-confirmed compatibility can be preserved.)
+Version Info: This version of bewarethedark is specifically for 
+use on the Dark Lands Survival server. Commands in darklands.lua 
+will only work on this server.
 
 
 Description
 -----------
 
-This is a mod for MineTest. It's only function is to make
+This is a mod for Minetest. It's only function is to make
 darkness and light a valid mechanic for the default minetest_game.
 In other voxel games, darkness is dangerous because it spawns
 monsters. In MineTest, darkness just makes it more likely for you
@@ -22,7 +21,7 @@ This mod changes that in a very direct fashion: you are damaged
 by darkness. The darker it gets, the more damage you take.
 
 
-Current behavior
+Behavior
 ----------------
 
 If you stand in a node with light level 6 or less, you slowly
@@ -32,12 +31,6 @@ you get damaged instead!
 
 Stand in bright light to replenish sanity. Sunlight is best, but 
 torches  work, too.
-
-
-Future plans
-------------
-
-Special command for server helpers to avoid darkness damage.
 
 
 Dependencies
