@@ -67,8 +67,8 @@ minetest.register_on_joinplayer(function(player)
     if not pl then
         M.players[name] = { pending_dmg = 0.0 }
         pl = M.players[name]
-        M.hud_init(player)
     end
+    M.hud_init(player)
 end)
 
 minetest.register_on_respawnplayer(function(player)
