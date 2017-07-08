@@ -91,67 +91,71 @@ minetest.register_globalstep(function(dtime)
         M.time_next_tick = M.time_next_tick + C.tick_time
         for _,player in ipairs(minetest.get_connected_players()) do
 
-            if player:get_hp() <= 0 then
-                -- dead players don't fear the dark
-                break
+            local do_damage = true -- damage happens by default
+
+            -- don't damage dead players
+            if player:get_hp() <= 0 then       
+                do_damage = false
             end
 
-            --skip protected players
+            -- don't damage protected players
             if minetest.get_modpath("darklands") then
                 local player_inv = player:get_inventory({name="dlspcinv"})
                 if player_inv:contains_item("dlspcinv", ItemStack("darklands:night_safe 1")) then
-                    return
+                    do_damage = false
                 end
             end
 
-            local name = player:get_player_name()
-            local pl = M.players[name]
-            local pos  = player:getpos()
-            local pos_y = pos.y
-            -- the middle of the block with the player's head
-            pos.y = math.floor(pos_y) + 1.5
-            local node = minetest.get_node(pos)
+            if do_damage == true then
+                local name = player:get_player_name()
+                local pl = M.players[name]
+                local pos  = player:getpos()
+                local pos_y = pos.y
+                -- the middle of the block with the player's head
+                pos.y = math.floor(pos_y) + 1.5
+                local node = minetest.get_node(pos)
 
-            local light_now   = minetest.get_node_light(pos) or 0
-            if node.name == 'ignore' then
-                -- can happen while world loads, set to something innocent
-                light_now = 9
-            end
-
-            local sanity = PPA.get_value(player, "bewarethedark_sanity")
-            local overflow_factor = 1.0
-
-            local dps = C.damage_for_light[light_now] * C.tick_time
-            --print("Standing in " .. node.name .. " at light " .. light_now .. " taking " .. dps);
-
-            if dps ~= 0 then
-
-                sanity = sanity - dps
-                --print("New sanity "..sanity)
-                if sanity < 0.0 and minetest.setting_getbool("enable_damage") then
-                    -- how much of this tick is hp damage?
-                    overflow_factor = (0.0 - sanity) / dps
-                    sanity = 0.0
+                local light_now   = minetest.get_node_light(pos) or 0
+                if node.name == 'ignore' then
+                    -- can happen while world loads, set to something innocent
+                    light_now = 9
                 end
 
-                PPA.set_value(player, "bewarethedark_sanity", sanity)
+                local sanity = PPA.get_value(player, "bewarethedark_sanity")
+                local overflow_factor = 1.0
 
-                M.hud_update(player, sanity)
-            end
+                local dps = C.damage_for_light[light_now] * C.tick_time
+                --print("Standing in " .. node.name .. " at light " .. light_now .. " taking " .. dps);
 
-            -- if insane, hp damage applies
-            if sanity <= 0.0 then
-                -- dps for HP potentially other than for sanity
-                dps = (C.insane_damage_for_light[light_now] or C.damage_for_light[light_now]) * C.tick_time * overflow_factor
-                if dps < 0.0 then dps = 0.0 end
+                if dps ~= 0 then
 
-                pl.pending_dmg = pl.pending_dmg + dps
+                    sanity = sanity - dps
+                    --print("New sanity "..sanity)
+                    if sanity < 0.0 and minetest.setting_getbool("enable_damage") then
+                        -- how much of this tick is hp damage?
+                        overflow_factor = (0.0 - sanity) / dps
+                        sanity = 0.0
+                    end
 
-                if pl.pending_dmg > 0.0 then
-                    local dmg = math.floor(pl.pending_dmg)
-                    --print("Deals "..dmg.." damage!")
-                    pl.pending_dmg = pl.pending_dmg - dmg
-                    player:set_hp( player:get_hp() - dmg )
+                    PPA.set_value(player, "bewarethedark_sanity", sanity)
+
+                    M.hud_update(player, sanity)
+                end
+
+                -- if insane, hp damage applies
+                if sanity <= 0.0 then
+                    -- dps for HP potentially other than for sanity
+                    dps = (C.insane_damage_for_light[light_now] or C.damage_for_light[light_now]) * C.tick_time * overflow_factor
+                    if dps < 0.0 then dps = 0.0 end
+
+                    pl.pending_dmg = pl.pending_dmg + dps
+
+                    if pl.pending_dmg > 0.0 then
+                        local dmg = math.floor(pl.pending_dmg)
+                        --print("Deals "..dmg.." damage!")
+                        pl.pending_dmg = pl.pending_dmg - dmg
+                        player:set_hp( player:get_hp() - dmg )
+                    end
                 end
             end
         end
