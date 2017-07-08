@@ -46,6 +46,10 @@ bewarethedark = {
 }
 local M = bewarethedark
 
+if minetest.get_modpath("darklands") then
+    dofile(minetest.get_modpath('bewarethedark')..'/darklands.lua')
+end
+
 dofile(minetest.get_modpath('bewarethedark')..'/configuration.lua')
 local C = M.config
 
@@ -90,6 +94,14 @@ minetest.register_globalstep(function(dtime)
             if player:get_hp() <= 0 then
                 -- dead players don't fear the dark
                 break
+            end
+
+            --skip protected players
+            if minetest.get_modpath("darklands") then
+                local player_inv = player:get_inventory({name="dlspcinv"})
+                if player_inv:contains_item("dlspcinv", ItemStack("darklands:night_safe 1")) then
+                    return
+                end
             end
 
             local name = player:get_player_name()
